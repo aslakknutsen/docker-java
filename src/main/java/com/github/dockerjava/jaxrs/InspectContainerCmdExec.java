@@ -1,9 +1,5 @@
 package com.github.dockerjava.jaxrs;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,16 +11,16 @@ public class InspectContainerCmdExec extends AbstrDockerCmdExec<InspectContainer
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(InspectContainerCmdExec.class);
 	
-	public InspectContainerCmdExec(WebTarget baseResource) {
+	public InspectContainerCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InspectContainerResponse execute(InspectContainerCmd command) {
-		WebTarget webResource = getBaseResource().path("/containers/{id}/json").resolveTemplate("id", command.getContainerId());
+		Requester webResource = getBaseResource().path("/containers/{id}/json").resolveTemplate("id", command.getContainerId());
 		
 		LOGGER.debug("GET: {}", webResource);
-		return webResource.request().accept(MediaType.APPLICATION_JSON).get(InspectContainerResponse.class);
+		return webResource.request().accept(Requester.MEDIA_TYPE_JSON).get(InspectContainerResponse.class);
 	}
 
 }

@@ -1,8 +1,5 @@
 package com.github.dockerjava.jaxrs;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,18 +9,19 @@ public class RemoveContainerCmdExec extends AbstrDockerCmdExec<RemoveContainerCm
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemoveContainerCmdExec.class);
 
-	public RemoveContainerCmdExec(WebTarget baseResource) {
+	public RemoveContainerCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(RemoveContainerCmd command) {
-		WebTarget webResource = getBaseResource().path("/containers/" + command.getContainerId())
+		Requester webResource = getBaseResource().path("/containers/" + command.getContainerId())
 				.queryParam("v", command.hasRemoveVolumesEnabled() ? "1" : "0")
 				.queryParam("force", command.hasForceEnabled() ? "1" : "0");
 		
 		LOGGER.trace("DELETE: {}", webResource);
-		/*String response = */webResource.request().accept(MediaType.APPLICATION_JSON).delete().close();
+		/*String response = */
+		webResource.request().accept(Requester.MEDIA_TYPE_JSON).delete();
 //		LOGGER.trace("Response: {}", response);
 
 		return null;

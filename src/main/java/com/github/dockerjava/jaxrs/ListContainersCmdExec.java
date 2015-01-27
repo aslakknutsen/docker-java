@@ -2,13 +2,10 @@ package com.github.dockerjava.jaxrs;
 
 import java.util.List;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.model.Container;
 
@@ -16,13 +13,13 @@ public class ListContainersCmdExec extends AbstrDockerCmdExec<ListContainersCmd,
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ListContainersCmdExec.class);
 	
-	public ListContainersCmdExec(WebTarget baseResource) {
+	public ListContainersCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected List<Container> execute(ListContainersCmd command) {
-		WebTarget webResource = getBaseResource().path("/containers/json")
+		Requester webResource = getBaseResource().path("/containers/json")
                 .queryParam("all", command.hasShowAllEnabled() ? "1" : "0")
                 .queryParam("since", command.getSinceId())
                 .queryParam("before", command.getBeforeId())
@@ -33,8 +30,8 @@ public class ListContainersCmdExec extends AbstrDockerCmdExec<ListContainersCmd,
         }
 
 		LOGGER.trace("GET: {}", webResource);
-		List<Container> containers = webResource.request().accept(MediaType.APPLICATION_JSON).get(new GenericType<List<Container>>() {
-        });
+		List<Container> containers = webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		        .get(TypeFactory.defaultInstance().constructCollectionType(List.class, Container.class));
 		LOGGER.trace("Response: {}", containers);
 
 		return containers;

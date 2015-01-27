@@ -2,13 +2,10 @@ package com.github.dockerjava.jaxrs;
 
 import java.util.List;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.dockerjava.api.command.ContainerDiffCmd;
 import com.github.dockerjava.api.model.ChangeLog;
 
@@ -17,18 +14,17 @@ public class ContainerDiffCmdExec extends AbstrDockerCmdExec<ContainerDiffCmd, L
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ContainerDiffCmdExec.class);
 	
-	public ContainerDiffCmdExec(WebTarget baseResource) {
+	public ContainerDiffCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected List<ChangeLog> execute(ContainerDiffCmd command) {
-		WebTarget webResource = getBaseResource().path("/containers/{id}/changes").resolveTemplate("id", command.getContainerId());
+		Requester webResource = getBaseResource().path("/containers/{id}/changes").resolveTemplate("id", command.getContainerId());
 		
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(MediaType.APPLICATION_JSON)
-				.get(new GenericType<List<ChangeLog>>() {
-        });
+		return webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+				.get(TypeFactory.defaultInstance().constructCollectionType(List.class, ChangeLog.class));
 	}
 
 }

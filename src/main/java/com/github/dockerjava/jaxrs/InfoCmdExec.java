@@ -1,8 +1,5 @@
 package com.github.dockerjava.jaxrs;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,15 +11,16 @@ public class InfoCmdExec extends AbstrDockerCmdExec<InfoCmd, Info> implements In
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(InfoCmdExec.class);
 	
-	public InfoCmdExec(WebTarget baseResource) {
+	public InfoCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Info execute(InfoCmd command) {
-		WebTarget webResource = getBaseResource().path("/info");
+		Requester webResource = getBaseResource().path("/info");
 
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(MediaType.APPLICATION_JSON).get(Info.class);	}
+		return webResource.request().accept(Requester.MEDIA_TYPE_JSON).get(Info.class);
+	}
 
 }

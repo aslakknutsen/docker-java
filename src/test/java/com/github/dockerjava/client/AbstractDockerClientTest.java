@@ -47,7 +47,7 @@ public abstract class AbstractDockerClientTest extends Assert {
 
 //		LOG.info("Pulling image 'busybox'");
 //		// need to block until image is pulled completely
-//		asString(dockerClient.pullImageCmd("busybox").withTag("latest").exec());
+		asString(dockerClient.pullImageCmd("busybox").withTag("latest").exec());
 
 
 
