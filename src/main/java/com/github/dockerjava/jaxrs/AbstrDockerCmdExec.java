@@ -4,9 +4,6 @@ import static com.github.dockerjava.Preconditions.checkNotNull;
 
 import java.io.IOException;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.WebTarget;
-
 import org.apache.commons.codec.binary.Base64;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,15 +15,15 @@ import com.github.dockerjava.api.model.AuthConfig;
 public abstract class AbstrDockerCmdExec<CMD_T extends DockerCmd<RES_T>, RES_T>
 		implements DockerCmdExec<CMD_T, RES_T> {
 
-	private WebTarget baseResource;
+	private Requester baseResource;
 
-	public AbstrDockerCmdExec(WebTarget baseResource) {
+	public AbstrDockerCmdExec(Requester baseResource) {
 		checkNotNull(baseResource,
 				"baseResource was not specified");
 		this.baseResource = baseResource;
 	}
 
-	protected WebTarget getBaseResource() {
+	protected Requester getBaseResource() {
 		return baseResource;
 	}
 
@@ -45,7 +42,7 @@ public abstract class AbstrDockerCmdExec<CMD_T extends DockerCmd<RES_T>, RES_T>
 		try {
 			result = execute(command);
 			
-		} catch (ProcessingException e) {
+		} catch (Exception e) {
 			if(e.getCause() instanceof DockerException) {
 				throw (DockerException)e.getCause();
 			} else {

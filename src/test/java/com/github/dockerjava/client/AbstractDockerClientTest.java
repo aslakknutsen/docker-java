@@ -45,9 +45,9 @@ public abstract class AbstractDockerClientTest extends Assert {
 				.withDockerCmdExecFactory(dockerCmdExecFactory)
 				.build();
 
-		LOG.info("Pulling image 'busybox'");
-		// need to block until image is pulled completely
-		asString(dockerClient.pullImageCmd("busybox").withTag("latest").exec());
+//		LOG.info("Pulling image 'busybox'");
+//		// need to block until image is pulled completely
+//		asString(dockerClient.pullImageCmd("busybox").withTag("latest").exec());
 
 
 
@@ -61,6 +61,8 @@ public abstract class AbstractDockerClientTest extends Assert {
 
     protected DockerClientConfig config(String password) {
         DockerClientConfig.DockerClientConfigBuilder builder = DockerClientConfig.createDefaultConfigBuilder()
+                .withUri("http://localhost:2375")
+                .withVersion("1.12")
                 .withServerAddress("https://index.docker.io/v1/");
         if (password!=null) {
             builder = builder.withPassword(password);

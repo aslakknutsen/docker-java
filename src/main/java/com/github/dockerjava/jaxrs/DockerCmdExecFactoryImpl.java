@@ -7,22 +7,17 @@ import java.net.URI;
 import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.glassfish.jersey.CommonProperties;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.github.dockerjava.api.DockerClientException;
 import com.github.dockerjava.api.command.AttachContainerCmd;
 import com.github.dockerjava.api.command.AuthCmd;
@@ -59,38 +54,21 @@ import com.github.dockerjava.api.command.UnpauseContainerCmd;
 import com.github.dockerjava.api.command.VersionCmd;
 import com.github.dockerjava.api.command.WaitContainerCmd;
 import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.jaxrs.util.JsonClientFilter;
-import com.github.dockerjava.jaxrs.util.ResponseStatusExceptionFilter;
-import com.github.dockerjava.jaxrs.util.SelectiveLoggingFilter;
 
 public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
 
     private static final Logger LOGGER = Logger.getLogger(DockerCmdExecFactoryImpl.class.getName());
-    private Client client;
-    private WebTarget baseResource;
+    private HttpClient client;
+    private Requester baseResource;
 
     @Override
     public void init(DockerClientConfig dockerClientConfig) {
         checkNotNull(dockerClientConfig, "config was not specified");
-
-        ClientConfig clientConfig = new ClientConfig();
-        clientConfig.connectorProvider(new ApacheConnectorProvider());
-        clientConfig.property(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true);
-
-        clientConfig.register(ResponseStatusExceptionFilter.class);
-        clientConfig.register(JsonClientFilter.class);
-        clientConfig.register(JacksonJsonProvider.class);
-
-        if (dockerClientConfig.isLoggingFilterEnabled()) {
-            clientConfig.register(new SelectiveLoggingFilter(LOGGER, true));
-        }
-
-        if (dockerClientConfig.getReadTimeout() != null) {
-            int readTimeout = dockerClientConfig.getReadTimeout();
-            clientConfig.property(ClientProperties.READ_TIMEOUT, readTimeout);
-        }
-
+        
         URI originalUri = dockerClientConfig.getUri();
+        if (originalUri.getScheme().equals("unix")) {
+            dockerClientConfig.setUri(UnixConnectionSocketFactory.sanitizeUri(originalUri));
+        }
 
         SSLContext sslContext;
         try {
@@ -102,25 +80,44 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
         PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(getSchemeRegistry(originalUri, sslContext));
         connManager.setMaxTotal(dockerClientConfig.getMaxTotalConnections());
         connManager.setDefaultMaxPerRoute(dockerClientConfig.getMaxPerRoutConnections());
-        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connManager);
 
-        ClientBuilder clientBuilder = ClientBuilder.newBuilder().withConfig(clientConfig);
+        RequestConfig.Builder requestConfig = RequestConfig.custom();
+        
+        if (dockerClientConfig.getReadTimeout() != null) {
+            int readTimeout = dockerClientConfig.getReadTimeout();
+            //clientConfig.property(ClientProperties.READ_TIMEOUT, readTimeout);
+            requestConfig.setConnectTimeout(readTimeout);
+        }
+        
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create()
+                .setConnectionManager(connManager)
+                .setDefaultRequestConfig(requestConfig.build());
+        
+        if(sslContext != null) {
+            clientBuilder.setSslcontext(sslContext);
+        }
+        
+                
+/*
+        clientConfig.register(ResponseStatusExceptionFilter.class);
+        clientConfig.register(JsonClientFilter.class);
+        clientConfig.register(JacksonJsonProvider.class);
 
-        if (sslContext != null) {
-            clientBuilder.sslContext(sslContext);
+        if (dockerClientConfig.isLoggingFilterEnabled()) {
+            clientConfig.register(new SelectiveLoggingFilter(LOGGER, true));
         }
 
-        client = clientBuilder.build();
+*/
 
-        if (originalUri.getScheme().equals("unix")) {
-            dockerClientConfig.setUri(UnixConnectionSocketFactory.sanitizeUri(originalUri));
-        }
-        WebTarget webResource = client.target(dockerClientConfig.getUri());
+        this.client = clientBuilder.build();
+        
+        URIBuilder webResource = new URIBuilder(dockerClientConfig.getUri());
+        Requester requester = Requester.from(client, webResource);
 
         if (dockerClientConfig.getVersion() == null || dockerClientConfig.getVersion().isEmpty()) {
-            baseResource = webResource;
+            baseResource = requester;
         } else {
-            baseResource = webResource.path("v" + dockerClientConfig.getVersion());
+            baseResource = requester.path("/v" + dockerClientConfig.getVersion());
         }
     }
 
@@ -134,7 +131,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
       return registryBuilder.build();
       }
 
-    protected WebTarget getBaseResource() {
+    protected Requester getBaseResource() {
         checkNotNull(baseResource, "Factory not initialized. You probably forgot to call init()!");
         return baseResource;
     }
@@ -307,7 +304,8 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
     @Override
     public void close() throws IOException {
         checkNotNull(client, "Factory not initialized. You probably forgot to call init()!");
-        client.close();
+        client.getConnectionManager().shutdown();
+        client = null;
     }
 
 }

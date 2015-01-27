@@ -1,6 +1,7 @@
 package com.github.dockerjava.jaxrs;
 
 import com.github.dockerjava.api.command.PullImageCmd;
+
 import com.github.dockerjava.api.model.AuthConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
