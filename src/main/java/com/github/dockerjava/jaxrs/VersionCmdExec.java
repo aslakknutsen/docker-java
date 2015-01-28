@@ -11,16 +11,16 @@ public class VersionCmdExec extends AbstrDockerCmdExec<VersionCmd, Version> impl
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(VersionCmdExec.class);
 
-	public VersionCmdExec(Requester baseResource) {
+	public VersionCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Version execute(VersionCmd command) {
-		Requester webResource = getBaseResource().path("/version");
+		WebTarget webResource = getBaseResource().path("/version");
 
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
 				.get(Version.class);
 	}
 

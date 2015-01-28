@@ -11,17 +11,17 @@ public class WaitContainerCmdExec extends AbstrDockerCmdExec<WaitContainerCmd, I
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WaitContainerCmdExec.class);
 
-	public WaitContainerCmdExec(Requester baseResource) {
+	public WaitContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Integer execute(WaitContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/wait")
+		WebTarget webResource = getBaseResource().path("/containers/{id}/wait")
 				.resolveTemplate("id", command.getContainerId());
 
 		LOGGER.trace("POST: {}", webResource);
-		ObjectNode ObjectNode = webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		ObjectNode ObjectNode = webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
 				.post(null, ObjectNode.class);
 		
         return ObjectNode.get("StatusCode").asInt();

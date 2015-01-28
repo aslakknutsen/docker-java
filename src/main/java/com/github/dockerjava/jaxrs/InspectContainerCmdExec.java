@@ -11,16 +11,16 @@ public class InspectContainerCmdExec extends AbstrDockerCmdExec<InspectContainer
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(InspectContainerCmdExec.class);
 	
-	public InspectContainerCmdExec(Requester baseResource) {
+	public InspectContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InspectContainerResponse execute(InspectContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/json").resolveTemplate("id", command.getContainerId());
+		WebTarget webResource = getBaseResource().path("/containers/{id}/json").resolveTemplate("id", command.getContainerId());
 		
 		LOGGER.debug("GET: {}", webResource);
-		return webResource.request().accept(Requester.MEDIA_TYPE_JSON).get(InspectContainerResponse.class);
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).get(InspectContainerResponse.class);
 	}
 
 }

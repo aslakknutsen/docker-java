@@ -13,16 +13,16 @@ public class SearchImagesCmdExec extends AbstrDockerCmdExec<SearchImagesCmd, Lis
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SearchImagesCmdExec.class);
 	
-	public SearchImagesCmdExec(Requester baseResource) {
+	public SearchImagesCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected List<SearchItem> execute(SearchImagesCmd command) {
-		Requester webResource = getBaseResource().path("/images/search").queryParam("term", command.getTerm());
+		WebTarget webResource = getBaseResource().path("/images/search").queryParam("term", command.getTerm());
 		
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
 		        .get(TypeFactory.defaultInstance().constructCollectionType(List.class, SearchItem.class));
 	}
 

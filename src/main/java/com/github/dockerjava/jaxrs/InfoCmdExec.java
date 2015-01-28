@@ -11,16 +11,16 @@ public class InfoCmdExec extends AbstrDockerCmdExec<InfoCmd, Info> implements In
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(InfoCmdExec.class);
 	
-	public InfoCmdExec(Requester baseResource) {
+	public InfoCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Info execute(InfoCmd command) {
-		Requester webResource = getBaseResource().path("/info");
+		WebTarget webResource = getBaseResource().path("/info");
 
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(Requester.MEDIA_TYPE_JSON).get(Info.class);
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).get(Info.class);
 	}
 
 }

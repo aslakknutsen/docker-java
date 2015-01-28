@@ -9,18 +9,18 @@ public class StopContainerCmdExec extends AbstrDockerCmdExec<StopContainerCmd, V
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StopContainerCmdExec.class);
 
-	public StopContainerCmdExec(Requester baseResource) {
+	public StopContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(StopContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/stop")
+		WebTarget webResource = getBaseResource().path("/containers/{id}/stop")
 				.resolveTemplate("id", command.getContainerId())
 				.queryParam("t", String.valueOf(command.getTimeout()));
 		
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(Requester.MEDIA_TYPE_JSON).post(null, Void.class);
+		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post(null, Void.class);
 
 		return null;
 	}

@@ -11,18 +11,18 @@ public class ExecStartCmdExec extends AbstrDockerCmdExec<ExecStartCmd, InputStre
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecStartCmdExec.class);
 
-    public ExecStartCmdExec(Requester baseResource) {
+    public ExecStartCmdExec(WebTarget baseResource) {
         super(baseResource);
     }
 
 
     @Override
     protected InputStream execute(ExecStartCmd command) {
-        Requester webResource = getBaseResource().path("/exec/{id}/start").resolveTemplate("id", command.getExecId());
+        WebTarget webResource = getBaseResource().path("/exec/{id}/start").resolveTemplate("id", command.getExecId());
 
         LOGGER.trace("POST: {}", webResource);
 
-        return webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+        return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
                 .post(command, InputStream.class);
     }
 }

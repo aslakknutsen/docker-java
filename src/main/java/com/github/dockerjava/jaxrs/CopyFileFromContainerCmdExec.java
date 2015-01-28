@@ -12,19 +12,19 @@ public class CopyFileFromContainerCmdExec extends AbstrDockerCmdExec<CopyFileFro
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CopyFileFromContainerCmdExec.class);
 	
-	public CopyFileFromContainerCmdExec(Requester baseResource) {
+	public CopyFileFromContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InputStream execute(CopyFileFromContainerCmd command) {
-		Requester webResource = getBaseResource()
+		WebTarget webResource = getBaseResource()
 				.path("/containers/{id}/copy")
 				.resolveTemplate("id", command.getContainerId());
 
 		LOGGER.trace("POST: " + webResource.toString());
 		
-		return webResource.request().accept(Requester.MEDIA_TYPE_OCTET_STREAM).post(command, InputStream.class);		
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_OCTET_STREAM).post(command, InputStream.class);		
 	}
 
 }

@@ -13,13 +13,13 @@ public class ListContainersCmdExec extends AbstrDockerCmdExec<ListContainersCmd,
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ListContainersCmdExec.class);
 	
-	public ListContainersCmdExec(Requester baseResource) {
+	public ListContainersCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected List<Container> execute(ListContainersCmd command) {
-		Requester webResource = getBaseResource().path("/containers/json")
+		WebTarget webResource = getBaseResource().path("/containers/json")
                 .queryParam("all", command.hasShowAllEnabled() ? "1" : "0")
                 .queryParam("since", command.getSinceId())
                 .queryParam("before", command.getBeforeId())
@@ -30,7 +30,7 @@ public class ListContainersCmdExec extends AbstrDockerCmdExec<ListContainersCmd,
         }
 
 		LOGGER.trace("GET: {}", webResource);
-		List<Container> containers = webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		List<Container> containers = webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
 		        .get(TypeFactory.defaultInstance().constructCollectionType(List.class, Container.class));
 		LOGGER.trace("Response: {}", containers);
 

@@ -15,15 +15,15 @@ import com.github.dockerjava.api.model.AuthConfig;
 public abstract class AbstrDockerCmdExec<CMD_T extends DockerCmd<RES_T>, RES_T>
 		implements DockerCmdExec<CMD_T, RES_T> {
 
-	private Requester baseResource;
+	private WebTarget baseResource;
 
-	public AbstrDockerCmdExec(Requester baseResource) {
+	public AbstrDockerCmdExec(WebTarget baseResource) {
 		checkNotNull(baseResource,
 				"baseResource was not specified");
 		this.baseResource = baseResource;
 	}
 
-	protected Requester getBaseResource() {
+	protected WebTarget getBaseResource() {
 		return baseResource;
 	}
 

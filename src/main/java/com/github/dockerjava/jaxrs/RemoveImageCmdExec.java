@@ -9,13 +9,13 @@ public class RemoveImageCmdExec extends AbstrDockerCmdExec<RemoveImageCmd, Void>
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemoveImageCmdExec.class);
 
-	public RemoveImageCmdExec(Requester baseResource) {
+	public RemoveImageCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(RemoveImageCmd command) {
-		Requester webResource = getBaseResource().path("/images/" + command.getImageId())
+		WebTarget webResource = getBaseResource().path("/images/" + command.getImageId())
 				.queryParam("force", command.hasForceEnabled() ? "1" : "0")
 				.queryParam("noprune", command.hasNoPruneEnabled() ? "1" : "0");
 

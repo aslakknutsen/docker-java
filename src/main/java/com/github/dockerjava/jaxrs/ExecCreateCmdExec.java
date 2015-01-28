@@ -11,16 +11,16 @@ public class ExecCreateCmdExec extends AbstrDockerCmdExec<ExecCreateCmd, ExecCre
     private static final Logger LOGGER = LoggerFactory
             .getLogger(VersionCmdExec.class);
 
-    public ExecCreateCmdExec(Requester baseResource) {
+    public ExecCreateCmdExec(WebTarget baseResource) {
         super(baseResource);
     }
 
     @Override
     protected ExecCreateCmdResponse execute(ExecCreateCmd command) {
-        Requester webResource = getBaseResource().path("/containers/{id}/exec").resolveTemplate("id", command.getContainerId());
+        WebTarget webResource = getBaseResource().path("/containers/{id}/exec").resolveTemplate("id", command.getContainerId());
 
         LOGGER.trace("POST: {}", webResource);
 
-        return webResource.request().accept(Requester.MEDIA_TYPE_JSON).post(command, ExecCreateCmdResponse.class);
+        return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post(command, ExecCreateCmdResponse.class);
     }
 }

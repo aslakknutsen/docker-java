@@ -11,19 +11,19 @@ public class PullImageCmdExec extends AbstrDockerCmdExec<PullImageCmd, InputStre
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PullImageCmdExec.class);
 	
-	public PullImageCmdExec(Requester baseResource) {
+	public PullImageCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InputStream execute(PullImageCmd command) {
-		Requester webResource = getBaseResource().path("/images/create")
+		WebTarget webResource = getBaseResource().path("/images/create")
                 .queryParam("tag", command.getTag())
                 .queryParam("fromImage", command.getRepository())
                 .queryParam("registry", command.getRegistry());
 
 		LOGGER.trace("POST: {}", webResource);
-		return webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
 		        .post(command, InputStream.class);
 //        return resourceWithOptionalAuthConfig(command, webResource.request())
 //				.accept(MediaType.APPLICATION_OCTET_STREAM_TYPE)

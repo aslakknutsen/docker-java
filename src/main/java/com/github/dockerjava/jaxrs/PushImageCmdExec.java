@@ -12,13 +12,13 @@ public class PushImageCmdExec extends AbstrDockerCmdExec<PushImageCmd, InputStre
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PushImageCmdExec.class);
 	
-	public PushImageCmdExec(Requester baseResource) {
+	public PushImageCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InputStream execute(PushImageCmd command) {
-		Requester webResource = getBaseResource().path("/images/" + name(command) + "/push")
+		WebTarget webResource = getBaseResource().path("/images/" + name(command) + "/push")
 		    .queryParam("tag", command.getTag());
 
 		final String registryAuth = registryAuth(command.getAuthConfig());
@@ -26,7 +26,7 @@ public class PushImageCmdExec extends AbstrDockerCmdExec<PushImageCmd, InputStre
 		return webResource
                 .request()
 				.header("X-Registry-Auth", registryAuth)
-				.accept(Requester.MEDIA_TYPE_JSON)
+				.accept(WebTarget.MediaType.APPLICATION_JSON)
 				.post(null, InputStream.class);
 	}
 	

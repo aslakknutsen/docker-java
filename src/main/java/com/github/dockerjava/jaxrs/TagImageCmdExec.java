@@ -10,13 +10,13 @@ public class TagImageCmdExec extends AbstrDockerCmdExec<TagImageCmd, Void> imple
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(TagImageCmdExec.class);
 	
-	public TagImageCmdExec(Requester baseResource) {
+	public TagImageCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(TagImageCmd command) {
-		Requester webResource = getBaseResource().path("/images/" + command.getImageId() + "/tag")
+		WebTarget webResource = getBaseResource().path("/images/" + command.getImageId() + "/tag")
                 .queryParam("repo", command.getRepository())
                 .queryParam("tag", command.getTag())
                 .queryParam("force", command.hasForceEnabled() ? "1" : "0");

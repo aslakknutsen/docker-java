@@ -59,7 +59,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
 
     private static final Logger LOGGER = Logger.getLogger(DockerCmdExecFactoryImpl.class.getName());
     private CloseableHttpClient client;
-    private Requester baseResource;
+    private WebTarget baseResource;
 
     @Override
     public void init(DockerClientConfig dockerClientConfig) {
@@ -113,7 +113,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
         this.client = clientBuilder.build();
         
         URIBuilder webResource = new URIBuilder(dockerClientConfig.getUri());
-        Requester requester = Requester.from(client, webResource);
+        WebTarget requester = WebTarget.from(client, webResource);
 
         if (dockerClientConfig.getVersion() == null || dockerClientConfig.getVersion().isEmpty()) {
             baseResource = requester;
@@ -132,7 +132,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
       return registryBuilder.build();
       }
 
-    protected Requester getBaseResource() {
+    protected WebTarget getBaseResource() {
         checkNotNull(baseResource, "Factory not initialized. You probably forgot to call init()!");
         return baseResource;
     }

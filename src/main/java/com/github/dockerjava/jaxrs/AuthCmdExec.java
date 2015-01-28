@@ -11,16 +11,16 @@ public class AuthCmdExec extends AbstrDockerCmdExec<AuthCmd,AuthResponse> implem
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AuthCmdExec.class);
 	
-	public AuthCmdExec(Requester baseResource) {
+	public AuthCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected AuthResponse execute(AuthCmd command) {
-		Requester webResource = getBaseResource().path("/auth");
+		WebTarget webResource = getBaseResource().path("/auth");
 		LOGGER.trace("POST: {}", webResource);
 		return webResource.request()
-                .accept(Requester.MEDIA_TYPE_JSON).post(command.getAuthConfig(), AuthResponse.class);
+                .accept(WebTarget.MediaType.APPLICATION_JSON).post(command.getAuthConfig(), AuthResponse.class);
 	}
 
 }

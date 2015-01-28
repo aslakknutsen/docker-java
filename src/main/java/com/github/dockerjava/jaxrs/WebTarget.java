@@ -20,43 +20,59 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.github.dockerjava.jaxrs.util.ResponseStatusExceptionFilter;
 
-public class Requester {
+public class WebTarget {
 
-    public static final String MEDIA_TYPE_JSON = "application/json";
-    public static final String MEDIA_TYPE_OCTET_STREAM = "application/octet-stream";
-    public static final String MEDIA_TYPE_PLAIN = "text/plain";
-    public static final String MEDIA_TYPE_TAR = "application/tar";
+    public enum MediaType {
+        APPLICATION_JSON("application/json"),
+        APPLICATION_OCTET_STREAM("application/octet-stream"),
+        APPLICATION_TAR("application/tar"),
+        TEXT_PLAIN("text/plain");
+
+        private String type;
+        private MediaType(String type) {
+            this.type = type;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
+    }
             
     private URIBuilder root;
     private CloseableHttpClient client;
     private HashMap<String, String> subsitution;
     
-    public static Requester from(CloseableHttpClient client, URIBuilder root) {
-        return new Requester(client, root, new HashMap<String, String>());
+    public static WebTarget from(CloseableHttpClient client, URIBuilder root) {
+        return new WebTarget(client, root, new HashMap<String, String>());
     }
     
-    private Requester(CloseableHttpClient client, URIBuilder root, HashMap<String, String> subsitution) {
+    private WebTarget(CloseableHttpClient client, URIBuilder root, HashMap<String, String> subsitution) {
         this.client = client;
         this.root = root;
         this.subsitution = subsitution;
     }
     
-    public Requester path(String path) {
+    public WebTarget path(String path) {
         URIBuilder newRoot = cloneRoot();
         newRoot.setPath(newRoot.getPath() +  path);
-        return new Requester(client, newRoot, subsitution);
+        return new WebTarget(client, newRoot, subsitution);
     }
     
-    public Requester queryParam(String key, String value) {
+    public WebTarget queryParam(String key, String value) {
         URIBuilder newRoot = cloneRoot();
         newRoot.addParameter(key, value);
-        return new Requester(client, newRoot, subsitution);
+        return new WebTarget(client, newRoot, subsitution);
     }
     
-    public Requester resolveTemplate(String key, String value) {
+    public WebTarget resolveTemplate(String key, String value) {
         HashMap<String, String> newSubstritution = new HashMap<String, String>(subsitution);
         newSubstritution.put(key, value);
-        return new Requester(client, root, newSubstritution);
+        return new WebTarget(client, root, newSubstritution);
     }
     
     private URIBuilder cloneRoot() {
@@ -74,14 +90,20 @@ public class Requester {
             this.headers = new HashMap<String, String>();
         }
 
+        public Request accept(MediaType mediaType) {
+            return accept(mediaType.getType());
+        }
+
         public Request accept(String mediaType) {
-            this.headers.put(HttpHeaders.ACCEPT, mediaType);
-            return this;
+            return header(HttpHeaders.ACCEPT, mediaType);
         }
         
+        public Request contentType(MediaType mediaType) {
+            return contentType(mediaType.getType());
+        }
+
         public Request contentType(String mediaType) {
-            this.headers.put(HttpHeaders.CONTENT_TYPE, mediaType);
-            return this;
+            return header(HttpHeaders.CONTENT_TYPE, mediaType);
         }
 
         public Request header(String header, String value) {
@@ -141,10 +163,14 @@ public class Requester {
 
         public <T> T post(Object obj, Class<T> type) {
             if(obj instanceof InputStream) {
-                return post(obj, MEDIA_TYPE_OCTET_STREAM, type);
+                return post(obj, MediaType.APPLICATION_OCTET_STREAM, type);
             } else {
-                return post(obj, MEDIA_TYPE_JSON, type);
+                return post(obj, MediaType.APPLICATION_JSON, type);
             }
+        }
+
+        public <T> T post(Object obj, MediaType mediaType, Class<T> type) {
+            return post(obj, mediaType.getType(), type);
         }
 
         public <T> T post(Object obj, String mediaType, Class<T> type) {

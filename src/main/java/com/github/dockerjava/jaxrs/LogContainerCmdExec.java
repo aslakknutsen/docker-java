@@ -11,13 +11,13 @@ public class LogContainerCmdExec extends AbstrDockerCmdExec<LogContainerCmd, Inp
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LogContainerCmdExec.class);
 
-	public LogContainerCmdExec(Requester baseResource) {
+	public LogContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InputStream execute(LogContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/logs")
+		WebTarget webResource = getBaseResource().path("/containers/{id}/logs")
 				.resolveTemplate("id", command.getContainerId())
 				.queryParam("timestamps", command.hasTimestampsEnabled() ? "1" : "0")
 				.queryParam("stdout", command.hasStdoutEnabled() ? "1" : "0")

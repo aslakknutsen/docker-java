@@ -14,16 +14,16 @@ public class ContainerDiffCmdExec extends AbstrDockerCmdExec<ContainerDiffCmd, L
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ContainerDiffCmdExec.class);
 	
-	public ContainerDiffCmdExec(Requester baseResource) {
+	public ContainerDiffCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected List<ChangeLog> execute(ContainerDiffCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/changes").resolveTemplate("id", command.getContainerId());
+		WebTarget webResource = getBaseResource().path("/containers/{id}/changes").resolveTemplate("id", command.getContainerId());
 		
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
 				.get(TypeFactory.defaultInstance().constructCollectionType(List.class, ChangeLog.class));
 	}
 

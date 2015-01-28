@@ -9,16 +9,16 @@ public class StartContainerCmdExec extends AbstrDockerCmdExec<StartContainerCmd,
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StartContainerCmdExec.class);
 
-	public StartContainerCmdExec(Requester baseResource) {
+	public StartContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(StartContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/start").resolveTemplate("id", command.getContainerId());
+		WebTarget webResource = getBaseResource().path("/containers/{id}/start").resolveTemplate("id", command.getContainerId());
 
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(Requester.MEDIA_TYPE_JSON).post(command, Void.class);
+		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post(command, Void.class);
 
 		return null;
 	}

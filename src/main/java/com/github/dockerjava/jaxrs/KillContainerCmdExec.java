@@ -10,20 +10,20 @@ public class KillContainerCmdExec extends AbstrDockerCmdExec<KillContainerCmd, V
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(KillContainerCmdExec.class);
 	
-	public KillContainerCmdExec(Requester baseResource) {
+	public KillContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(KillContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/kill").resolveTemplate("id", command.getContainerId());
+		WebTarget webResource = getBaseResource().path("/containers/{id}/kill").resolveTemplate("id", command.getContainerId());
 
 		if(command.getSignal() != null) {
 			webResource = webResource.queryParam("signal", command.getSignal());
 		}
 	
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(Requester.MEDIA_TYPE_JSON).post(null, Void.class);	
+		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post(null, Void.class);	
 
 		return null;
 	}

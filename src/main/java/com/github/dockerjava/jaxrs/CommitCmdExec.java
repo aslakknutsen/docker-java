@@ -11,13 +11,13 @@ public class CommitCmdExec extends AbstrDockerCmdExec<CommitCmd, String> impleme
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CommitCmdExec.class);
 	
-	public CommitCmdExec(Requester baseResource) {
+	public CommitCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected String execute(CommitCmd command) {
-		Requester webResource = getBaseResource().path("/commit")
+		WebTarget webResource = getBaseResource().path("/commit")
                 .queryParam("container", command.getContainerId())
                 .queryParam("repo", command.getRepository())
                 .queryParam("tag", command.getTag())

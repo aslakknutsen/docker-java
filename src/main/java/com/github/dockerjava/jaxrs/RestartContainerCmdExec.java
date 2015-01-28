@@ -9,18 +9,18 @@ public class RestartContainerCmdExec extends AbstrDockerCmdExec<RestartContainer
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestartContainerCmdExec.class);
 
-	public RestartContainerCmdExec(Requester baseResource) {
+	public RestartContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(RestartContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/restart")
+		WebTarget webResource = getBaseResource().path("/containers/{id}/restart")
 				.resolveTemplate("id", command.getContainerId())
 				.queryParam("t", String.valueOf(command.getTimeout()));
 		
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(Requester.MEDIA_TYPE_JSON).post(null, Void.class);
+		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post(null, Void.class);
 
 		return null;
 	}

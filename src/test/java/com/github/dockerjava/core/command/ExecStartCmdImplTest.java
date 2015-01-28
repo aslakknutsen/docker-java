@@ -55,6 +55,9 @@ public class ExecStartCmdImplTest extends AbstractDockerClientTest {
             .withCmd("touch", "/execStartTest.log").exec();
         dockerClient.execStartCmd(execCreateCmdResponse.getId()).exec();
 
+        // Required, startCmd return before command is finished executing. Log might not be there yet
+        Thread.sleep(100);
+
         InputStream response = dockerClient.copyFileFromContainerCmd(container.getId(), "/execStartTest.log").exec();
         boolean bytesAvailable = response.available() > 0;
         assertTrue(bytesAvailable, "The file was not copied from the container.");

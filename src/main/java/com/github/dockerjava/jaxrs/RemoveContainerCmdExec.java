@@ -9,19 +9,19 @@ public class RemoveContainerCmdExec extends AbstrDockerCmdExec<RemoveContainerCm
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemoveContainerCmdExec.class);
 
-	public RemoveContainerCmdExec(Requester baseResource) {
+	public RemoveContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(RemoveContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/" + command.getContainerId())
+		WebTarget webResource = getBaseResource().path("/containers/" + command.getContainerId())
 				.queryParam("v", command.hasRemoveVolumesEnabled() ? "1" : "0")
 				.queryParam("force", command.hasForceEnabled() ? "1" : "0");
 		
 		LOGGER.trace("DELETE: {}", webResource);
 		/*String response = */
-		webResource.request().accept(Requester.MEDIA_TYPE_JSON).delete();
+		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).delete();
 //		LOGGER.trace("Response: {}", response);
 
 		return null;

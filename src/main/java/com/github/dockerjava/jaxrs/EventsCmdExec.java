@@ -21,7 +21,7 @@ import com.github.dockerjava.api.model.Event;
 public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService> implements EventsCmd.Exec {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventsCmdExec.class);
     
-    public EventsCmdExec(Requester baseResource) {
+    public EventsCmdExec(WebTarget baseResource) {
         super(baseResource);
     }
 
@@ -29,7 +29,7 @@ public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService
     protected ExecutorService execute(EventsCmd command) {
     	ExecutorService executorService = Executors.newSingleThreadExecutor();
     	
-        Requester webResource = getBaseResource().path("/events")
+        WebTarget webResource = getBaseResource().path("/events")
                 .queryParam("since", command.getSince())
                 .queryParam("until", command.getUntil());
 
@@ -44,14 +44,14 @@ public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService
         private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
         private final EventCallback eventCallback;
-        private final Requester webTarget;
+        private final WebTarget webTarget;
 
-        private EventNotifier(EventCallback eventCallback, Requester webTarget) {
+        private EventNotifier(EventCallback eventCallback, WebTarget webTarget) {
             this.eventCallback = eventCallback;
             this.webTarget = webTarget;
         }
 
-        public static EventNotifier create(EventCallback eventCallback, Requester webTarget) {
+        public static EventNotifier create(EventCallback eventCallback, WebTarget webTarget) {
             checkNotNull(eventCallback, "An EventCallback must be provided");
             checkNotNull(webTarget, "An WebTarget must be provided");
             return new EventNotifier(eventCallback, webTarget);

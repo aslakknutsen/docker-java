@@ -11,13 +11,13 @@ public class PingCmdExec extends AbstrDockerCmdExec<PingCmd, Void> implements Pi
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PingCmdExec.class);
 
-	public PingCmdExec(Requester baseResource) {
+	public PingCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(PingCmd command) {
-		Requester webResource = getBaseResource().path("/_ping");
+		WebTarget webResource = getBaseResource().path("/_ping");
 	       
         LOGGER.trace("GET: {}", webResource);
         webResource.request().get(Response.class);

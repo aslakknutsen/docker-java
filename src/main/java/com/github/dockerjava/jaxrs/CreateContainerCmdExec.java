@@ -10,20 +10,20 @@ public class CreateContainerCmdExec extends AbstrDockerCmdExec<CreateContainerCm
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(CreateContainerCmdExec.class);
 	
-	public CreateContainerCmdExec(Requester baseResource) {
+	public CreateContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected CreateContainerResponse execute(CreateContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/create");
+		WebTarget webResource = getBaseResource().path("/containers/create");
 
         if (command.getName() != null) {
             webResource = webResource.queryParam("name", command.getName());
         }
 
 		LOGGER.trace("POST: {} ", webResource);
-		return webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
 				.post(command, CreateContainerResponse.class);
 	}
 

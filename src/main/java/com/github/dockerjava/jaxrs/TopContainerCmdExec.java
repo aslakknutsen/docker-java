@@ -11,20 +11,20 @@ public class TopContainerCmdExec extends AbstrDockerCmdExec<TopContainerCmd, Top
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TopContainerCmdExec.class);
 
-	public TopContainerCmdExec(Requester baseResource) {
+	public TopContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected TopContainerResponse execute(TopContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/top")
+		WebTarget webResource = getBaseResource().path("/containers/{id}/top")
 				.resolveTemplate("id", command.getContainerId());
 
 		if(!StringUtils.isEmpty(command.getPsArgs()))
 			webResource = webResource.queryParam("ps_args", command.getPsArgs());
 		
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(Requester.MEDIA_TYPE_JSON).get(TopContainerResponse.class);
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).get(TopContainerResponse.class);
 	}
 
 }

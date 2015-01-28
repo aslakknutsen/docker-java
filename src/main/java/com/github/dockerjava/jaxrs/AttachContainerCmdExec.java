@@ -12,13 +12,13 @@ public class AttachContainerCmdExec extends AbstrDockerCmdExec<AttachContainerCm
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AttachContainerCmdExec.class);
 	
-	public AttachContainerCmdExec(Requester baseResource) {
+	public AttachContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InputStream execute(AttachContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/attach")
+		WebTarget webResource = getBaseResource().path("/containers/{id}/attach")
                 .resolveTemplate("id", command.getContainerId())
                 .queryParam("logs", command.hasLogsEnabled() ? "1" : "0")
              // .queryParam("stdin", command.hasStdinEnabled() ? "1" : "0")
@@ -28,7 +28,7 @@ public class AttachContainerCmdExec extends AbstrDockerCmdExec<AttachContainerCm
 
 		LOGGER.trace("POST: {}", webResource);
 		
-		return webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
 				.post(null, InputStream.class);
 	}
 

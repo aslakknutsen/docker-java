@@ -9,17 +9,17 @@ public class UnpauseContainerCmdExec extends AbstrDockerCmdExec<UnpauseContainer
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnpauseContainerCmdExec.class);
 
-	public UnpauseContainerCmdExec(Requester baseResource) {
+	public UnpauseContainerCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(UnpauseContainerCmd command) {
-		Requester webResource = getBaseResource().path("/containers/{id}/unpause")
+		WebTarget webResource = getBaseResource().path("/containers/{id}/unpause")
 				.resolveTemplate("id", command.getContainerId());
 		
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
 				.post(null, Void.class);
 
 		return null;

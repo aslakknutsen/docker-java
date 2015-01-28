@@ -12,13 +12,13 @@ public class BuildImageCmdExec extends AbstrDockerCmdExec<BuildImageCmd, InputSt
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(BuildImageCmdExec.class);
 	
-	public BuildImageCmdExec(Requester baseResource) {
+	public BuildImageCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InputStream execute(BuildImageCmd command) {
-		Requester webResource = getBaseResource().path("/build");
+		WebTarget webResource = getBaseResource().path("/build");
 		
 		if(command.getTag() != null) {
 			webResource = webResource.queryParam("t", command.getTag());
@@ -40,8 +40,8 @@ public class BuildImageCmdExec extends AbstrDockerCmdExec<BuildImageCmd, InputSt
 		LOGGER.debug("POST: {}", webResource);
 		return webResource
                 .request()
-				.accept(Requester.MEDIA_TYPE_PLAIN)
-				.post(command.getTarInputStream(), Requester.MEDIA_TYPE_TAR, InputStream.class);
+				.accept(WebTarget.MediaType.TEXT_PLAIN)
+				.post(command.getTarInputStream(), WebTarget.MediaType.APPLICATION_TAR, InputStream.class);
 		
 	}
 

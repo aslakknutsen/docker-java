@@ -11,20 +11,20 @@ public class CreateImageCmdExec extends AbstrDockerCmdExec<CreateImageCmd, Creat
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CreateImageCmdExec.class);
 	
-	public CreateImageCmdExec(Requester baseResource) {
+	public CreateImageCmdExec(WebTarget baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected CreateImageResponse execute(CreateImageCmd command) {
-		Requester webResource = getBaseResource()
+		WebTarget webResource = getBaseResource()
                 .path("/images/create")
                 .queryParam("repo", command.getRepository())
                 .queryParam("tag", command.getTag())
                 .queryParam("fromSrc", "-");
 		
 		LOGGER.trace("POST: {}", webResource);
-		return webResource.request().accept(Requester.MEDIA_TYPE_OCTET_STREAM)
+		return webResource.request().accept(WebTarget.MediaType.APPLICATION_OCTET_STREAM)
 				.post(command.getImageStream(), CreateImageResponse.class);
 	}
 }
