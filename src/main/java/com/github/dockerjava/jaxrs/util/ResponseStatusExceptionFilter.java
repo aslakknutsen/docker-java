@@ -1,16 +1,9 @@
 package com.github.dockerjava.jaxrs.util;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
 
 import com.github.dockerjava.api.BadRequestException;
 import com.github.dockerjava.api.ConflictException;
@@ -27,36 +20,45 @@ import com.github.dockerjava.api.UnauthorizedException;
  * @author marcus
  *
  */
-public class ResponseStatusExceptionFilter implements ClientResponseFilter {
+public class ResponseStatusExceptionFilter { // implements ClientResponseFilter {
 
 
-    @Override
-    public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
-    	int status = responseContext.getStatus();
-		switch (status) {
+   // @Override
+    //public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
+    public static void convertReturnCode(HttpResponse response) {
+		int status = response.getStatusLine().getStatusCode();
+        switch (status) {
 		case 200:
 		case 201:	
 		case 204:
 			return;
 		case 304:
-			throw new NotModifiedException(getBodyAsMessage(responseContext));
+			throw new NotModifiedException(getBodyAsMessage(response));
 		case 400:
-			throw new BadRequestException(getBodyAsMessage(responseContext));
+			throw new BadRequestException(getBodyAsMessage(response));
 		case 401:
-			throw new UnauthorizedException(getBodyAsMessage(responseContext));	
+			throw new UnauthorizedException(getBodyAsMessage(response));	
 		case 404:
-			throw new NotFoundException(getBodyAsMessage(responseContext));
+			throw new NotFoundException(getBodyAsMessage(response));
 		case 406:
-			throw new NotAcceptableException(getBodyAsMessage(responseContext));
+			throw new NotAcceptableException(getBodyAsMessage(response));
 		case 409:
-			throw new ConflictException(getBodyAsMessage(responseContext));
+			throw new ConflictException(getBodyAsMessage(response));
 		case 500:
-			throw new InternalServerErrorException(getBodyAsMessage(responseContext));
+			throw new InternalServerErrorException(getBodyAsMessage(response));
 		default:
-			throw new DockerException(getBodyAsMessage(responseContext), status);
+			throw new DockerException(getBodyAsMessage(response), status);
 		}
     }
-
+    
+    public static String getBodyAsMessage(HttpResponse response) {
+        try {
+            return IOUtils.toString(response.getEntity().getContent());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+/*
 	public String getBodyAsMessage(ClientResponseContext responseContext)
 			throws IOException {
 	    if (responseContext.hasEntity()) {
@@ -93,4 +95,5 @@ public class ResponseStatusExceptionFilter implements ClientResponseFilter {
 	    }
 	    return null;
 	}
+*/
 }

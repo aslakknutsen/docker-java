@@ -61,7 +61,7 @@ public abstract class AbstractDockerClientTest extends Assert {
 
     protected DockerClientConfig config(String password) {
         DockerClientConfig.DockerClientConfigBuilder builder = DockerClientConfig.createDefaultConfigBuilder()
-                .withUri("http://localhost:2375")
+                .withUri("unix:///var/run/docker.sock")
                 .withVersion("1.12")
                 .withServerAddress("https://index.docker.io/v1/");
         if (password!=null) {

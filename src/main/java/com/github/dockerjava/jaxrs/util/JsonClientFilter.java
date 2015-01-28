@@ -1,20 +1,15 @@
 package com.github.dockerjava.jaxrs.util;
 
 
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 
 /**
  *
  * @author Konstantin Pelykh (kpelykh@gmail.com)
  *
  */
-public class JsonClientFilter implements ClientResponseFilter {
+public class JsonClientFilter { //implements ClientResponseFilter {
 
-
+/*
     @Override
     public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
         if (responseContext.getMediaType() != null && responseContext.getMediaType().isCompatible(MediaType.TEXT_PLAIN_TYPE)) {
@@ -22,4 +17,5 @@ public class JsonClientFilter implements ClientResponseFilter {
             responseContext.getHeaders().putSingle("Content-Type", newContentType);
         }
     }
+*/
 }

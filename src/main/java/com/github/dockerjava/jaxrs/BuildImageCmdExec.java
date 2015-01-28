@@ -1,15 +1,7 @@
 package com.github.dockerjava.jaxrs;
 
-import static javax.ws.rs.client.Entity.entity;
-
 import java.io.InputStream;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.client.RequestEntityProcessing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,13 +12,13 @@ public class BuildImageCmdExec extends AbstrDockerCmdExec<BuildImageCmd, InputSt
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(BuildImageCmdExec.class);
 	
-	public BuildImageCmdExec(WebTarget baseResource) {
+	public BuildImageCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InputStream execute(BuildImageCmd command) {
-		WebTarget webResource = getBaseResource().path("/build");
+		Requester webResource = getBaseResource().path("/build");
 		
 		if(command.getTag() != null) {
 			webResource = webResource.queryParam("t", command.getTag());
@@ -42,14 +34,14 @@ public class BuildImageCmdExec extends AbstrDockerCmdExec<BuildImageCmd, InputSt
         }
 		
 
-	  webResource.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
-	  webResource.property(ClientProperties.CHUNKED_ENCODING_SIZE, 1024*1024);
+	  //webResource.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
+	  //webResource.property(ClientProperties.CHUNKED_ENCODING_SIZE, 1024*1024);
 
 		LOGGER.debug("POST: {}", webResource);
 		return webResource
                 .request()
-				.accept(MediaType.TEXT_PLAIN)
-				.post(entity(command.getTarInputStream(), "application/tar"), Response.class).readEntity(InputStream.class);
+				.accept(Requester.MEDIA_TYPE_PLAIN)
+				.post(command.getTarInputStream(), Requester.MEDIA_TYPE_TAR, InputStream.class);
 		
 	}
 

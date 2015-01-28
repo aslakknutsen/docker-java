@@ -1,35 +1,41 @@
 package com.github.dockerjava.jaxrs;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.github.dockerjava.jaxrs.util.ResponseStatusExceptionFilter;
 
 public class Requester {
 
     public static final String MEDIA_TYPE_JSON = "application/json";
     public static final String MEDIA_TYPE_OCTET_STREAM = "application/octet-stream";
-    
+    public static final String MEDIA_TYPE_PLAIN = "text/plain";
+    public static final String MEDIA_TYPE_TAR = "application/tar";
+            
     private URIBuilder root;
-    private HttpClient client;
+    private CloseableHttpClient client;
     private HashMap<String, String> subsitution;
     
-    public static Requester from(HttpClient client, URIBuilder root) {
+    public static Requester from(CloseableHttpClient client, URIBuilder root) {
         return new Requester(client, root, new HashMap<String, String>());
     }
     
-    private Requester(HttpClient client, URIBuilder root, HashMap<String, String> subsitution) {
+    private Requester(CloseableHttpClient client, URIBuilder root, HashMap<String, String> subsitution) {
         this.client = client;
         this.root = root;
         this.subsitution = subsitution;
@@ -85,77 +91,137 @@ public class Requester {
 
         public <T> T get(Class<T> type) {
             RequestBuilder builder = setupBuilder(RequestBuilder.get());
+            CloseableHttpResponse response = null;
             try {
-                System.out.println("URI: " + builder.getUri());
-                HttpResponse response = client.execute(builder.build());
+                System.out.println(builder.getMethod() + ": " + builder.getUri());
+                response = client.execute(builder.build());
+                checkResponse(response);
 
                 // hack
                 if(type == InputStream.class) {
-                    return (T)response.getEntity().getContent();
+                    return (T)new ResponseClosableInputStream(response, response.getEntity().getContent());
                 }
                 if(type == Void.class) {
+                    closeResponse(response);
                     return (T) null;
                 }
 
-                ObjectMapper mapper = new ObjectMapper();
-
-                String responseEntity = IOUtils.toString(response.getEntity().getContent());
+                ObjectMapper mapper = new ObjectMapper(); 
+                String responseEntity = EntityUtils.toString(response.getEntity());
                 System.out.println("Response: " + responseEntity);
+
+                closeResponse(response);
                 return mapper.readValue(responseEntity, type);
             } catch (Exception e) {
+                closeResponse(response);
                 throw new RuntimeException(e);
             }
         }
-        
+
         public <T> T get(CollectionType type) {
             RequestBuilder builder = setupBuilder(RequestBuilder.get());
+            CloseableHttpResponse response = null;
             try {
-                System.out.println("URI: " + builder.getUri());
-                HttpResponse response = client.execute(builder.build());
-                ObjectMapper mapper = new ObjectMapper();
+                System.out.println(builder.getMethod() + ": " + builder.getUri());
+                response = client.execute(builder.build());
+                checkResponse(response);
 
-                String responseEntity = IOUtils.toString(response.getEntity().getContent());
+                ObjectMapper mapper = new ObjectMapper();
+                
+                String responseEntity = EntityUtils.toString(response.getEntity());
                 System.out.println("Response: " + responseEntity);
+
+                closeResponse(response);
                 return mapper.readValue(responseEntity, type);
             } catch (Exception e) {
+                closeResponse(response);
                 throw new RuntimeException(e);
             }
         }
 
         public <T> T post(Object obj, Class<T> type) {
+            if(obj instanceof InputStream) {
+                return post(obj, MEDIA_TYPE_OCTET_STREAM, type);
+            } else {
+                return post(obj, MEDIA_TYPE_JSON, type);
+            }
+        }
+
+        public <T> T post(Object obj, String mediaType, Class<T> type) {
             ObjectMapper mapper = new ObjectMapper();
             RequestBuilder builder = setupBuilder(RequestBuilder.post());
-            if(builder.getHeaders(HttpHeaders.CONTENT_TYPE) == null || builder.getHeaders(HttpHeaders.CONTENT_TYPE).length == 0) {
-                builder.addHeader(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_JSON);
-            }
+            CloseableHttpResponse response = null;
             try {
-                String requestEntity = mapper.writeValueAsString(obj);
-                System.out.println("URI: " + builder.getUri());
-                System.out.println("Request: " + requestEntity);
-                builder.setEntity(new StringEntity(requestEntity, "UTF-8"));
-                HttpResponse response = client.execute(builder.build());
+                System.out.println(builder.getMethod() + ": " + builder.getUri());
+                builder.addHeader(HttpHeaders.CONTENT_TYPE, mediaType);
+                if(obj instanceof InputStream) {
+                    builder.setEntity(new InputStreamEntity((InputStream)obj));
+                } else {
+                    if(obj != null) {
+                        String requestEntity = mapper.writeValueAsString(obj);
+                        System.out.println("Request: " + requestEntity);
+                        builder.setEntity(new StringEntity(requestEntity, "UTF-8"));
+                    }
+                }
+                response = client.execute(builder.build());
+                checkResponse(response);
 
                 // hack
                 if(type == InputStream.class) {
-                    return (T)response.getEntity().getContent();
+                    return (T)new ResponseClosableInputStream(response, response.getEntity().getContent());
                 }
                 if(type == Void.class) {
+                    closeResponse(response);
                     return (T) null;
                 }
-                String responseEntity = IOUtils.toString(response.getEntity().getContent());
+                
+                String responseEntity = EntityUtils.toString(response.getEntity());
                 System.out.println("Response: " + responseEntity);
+                
+                closeResponse(response);
                 return mapper.readValue(responseEntity, type);
             } catch (Exception e) {
+                closeResponse(response);
                 throw new RuntimeException(e);
             }
         }
         
         public void delete() {
             RequestBuilder builder = setupBuilder(RequestBuilder.delete());
+            CloseableHttpResponse response = null;
             try {
-                client.execute(builder.build());
+                response = client.execute(builder.build());
+                checkResponse(response);
+                
             } catch (Exception e) {
+                closeResponse(response);
                 throw new RuntimeException(e);
+            }
+        }
+
+        private void closeResponse(CloseableHttpResponse response) {
+            if(response == null) {
+                return;
+            }
+            try {
+                System.out.println("Closing");
+                ((Closeable)response).close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private void checkResponse(CloseableHttpResponse response) {
+            boolean thrownException = false;
+            try {
+                ResponseStatusExceptionFilter.convertReturnCode(response);
+            } catch(RuntimeException e){
+                thrownException = true;
+                throw e;
+            } finally {
+                if(thrownException) {
+                    closeResponse(response);
+                }
             }
         }
         
@@ -173,6 +239,58 @@ public class Requester {
                 target = target.replaceAll("%7B" + entry.getKey() + "%7D", entry.getValue());
             }
             return target;
+        }
+        
+        private class ResponseClosableInputStream extends InputStream {
+            private CloseableHttpResponse response;
+            private InputStream delegate;
+            
+            public ResponseClosableInputStream(CloseableHttpResponse response, InputStream delegate) {
+                this.response = response;
+                this.delegate = delegate;
+            }
+            
+            public int read() throws IOException {
+                return delegate.read();
+            }
+            public int hashCode() {
+                return delegate.hashCode();
+            }
+            public int read(byte[] b) throws IOException {
+                return delegate.read(b);
+            }
+            public boolean equals(Object obj) {
+                return delegate.equals(obj);
+            }
+            public int read(byte[] b, int off, int len) throws IOException {
+                return delegate.read(b, off, len);
+            }
+            public long skip(long n) throws IOException {
+                return delegate.skip(n);
+            }
+            public String toString() {
+                return delegate.toString();
+            }
+            public int available() throws IOException {
+                return delegate.available();
+            }
+            public void close() throws IOException {
+                System.out.println("Closing");
+                try {
+                    response.close();
+                } finally {
+                    delegate.close();
+                }
+            }
+            public void mark(int readlimit) {
+                delegate.mark(readlimit);
+            }
+            public void reset() throws IOException {
+                delegate.reset();
+            }
+            public boolean markSupported() {
+                return delegate.markSupported();
+            }
         }
     }
     

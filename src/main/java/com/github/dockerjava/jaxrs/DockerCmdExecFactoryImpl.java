@@ -8,13 +8,13 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
@@ -58,7 +58,7 @@ import com.github.dockerjava.core.DockerClientConfig;
 public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
 
     private static final Logger LOGGER = Logger.getLogger(DockerCmdExecFactoryImpl.class.getName());
-    private HttpClient client;
+    private CloseableHttpClient client;
     private Requester baseResource;
 
     @Override
@@ -79,7 +79,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
 
         PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(getSchemeRegistry(originalUri, sslContext));
         connManager.setMaxTotal(dockerClientConfig.getMaxTotalConnections());
-        connManager.setDefaultMaxPerRoute(dockerClientConfig.getMaxPerRoutConnections());
+        connManager.setDefaultMaxPerRoute(20); //dockerClientConfig.getMaxPerRoutConnections());
 
         RequestConfig.Builder requestConfig = RequestConfig.custom();
         
@@ -87,6 +87,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
             int readTimeout = dockerClientConfig.getReadTimeout();
             //clientConfig.property(ClientProperties.READ_TIMEOUT, readTimeout);
             requestConfig.setConnectTimeout(readTimeout);
+            requestConfig.setConnectionRequestTimeout(2000);
         }
         
         HttpClientBuilder clientBuilder = HttpClientBuilder.create()
@@ -304,7 +305,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
     @Override
     public void close() throws IOException {
         checkNotNull(client, "Factory not initialized. You probably forgot to call init()!");
-        client.getConnectionManager().shutdown();
+        client.close();
         client = null;
     }
 

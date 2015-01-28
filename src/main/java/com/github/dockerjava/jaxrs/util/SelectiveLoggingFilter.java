@@ -1,16 +1,5 @@
 package com.github.dockerjava.jaxrs.util;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Logger;
-
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-
-import org.glassfish.jersey.filter.LoggingFilter;
 
 /**
  * A version of the logging filter that will avoid trying to log entities which can cause
@@ -19,8 +8,9 @@ import org.glassfish.jersey.filter.LoggingFilter;
  * @author sfitts
  *
  */
-public class SelectiveLoggingFilter extends LoggingFilter {
+public class SelectiveLoggingFilter { //extends LoggingFilter {
     
+    /*
     // Immutable'ish
     private static final Set<String> SKIPPED_CONTENT; 
     static {
@@ -44,5 +34,5 @@ public class SelectiveLoggingFilter extends LoggingFilter {
             super.filter(context);
         }
     }
-    
+    */
 }
