@@ -4,7 +4,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpHeaders;
@@ -18,6 +20,8 @@ import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.jaxrs.util.ResponseStatusExceptionFilter;
 
 public class WebTarget {
@@ -111,6 +115,10 @@ public class WebTarget {
             return this;
         }
 
+        public <T> List<T> getList(Class<T> subtype) {
+            return get(TypeFactory.defaultInstance().constructCollectionType(List.class, subtype));
+        }
+
         @SuppressWarnings("unchecked")
         public <T> T get(Class<T> type) {
             RequestBuilder builder = setupBuilder(RequestBuilder.get());
@@ -141,7 +149,7 @@ public class WebTarget {
             }
         }
 
-        public <T> T get(CollectionType type) {
+        private <T> T get(CollectionType type) {
             RequestBuilder builder = setupBuilder(RequestBuilder.get());
             CloseableHttpResponse response = null;
             try {

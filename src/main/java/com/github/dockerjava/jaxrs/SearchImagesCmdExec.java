@@ -5,7 +5,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.dockerjava.api.command.SearchImagesCmd;
 import com.github.dockerjava.api.model.SearchItem;
 import com.github.dockerjava.jaxrs.WebTarget.MediaType;
@@ -24,7 +23,7 @@ public class SearchImagesCmdExec extends AbstrDockerCmdExec<SearchImagesCmd, Lis
 		
 		LOGGER.trace("GET: {}", webResource);
 		return webResource.request().accept(MediaType.APPLICATION_JSON)
-		        .get(TypeFactory.defaultInstance().constructCollectionType(List.class, SearchItem.class));
+		        .getList(SearchItem.class);
 	}
 
 }

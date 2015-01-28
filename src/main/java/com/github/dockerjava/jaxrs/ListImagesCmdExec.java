@@ -7,7 +7,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.dockerjava.api.command.ListImagesCmd;
 import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.jaxrs.WebTarget.MediaType;
@@ -36,7 +35,7 @@ public class ListImagesCmdExec extends
 
 		List<Image> images = webResource.request()
 				.accept(MediaType.APPLICATION_JSON)
-				.get(TypeFactory.defaultInstance().constructCollectionType(List.class, Image.class));
+				.getList(Image.class);
 		LOGGER.trace("Response: {}", images);
 
 		return images;
