@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.InspectContainerCmd;
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class InspectContainerCmdExec extends AbstrDockerCmdExec<InspectContainerCmd, InspectContainerResponse> implements InspectContainerCmd.Exec {
 	
@@ -20,7 +21,7 @@ public class InspectContainerCmdExec extends AbstrDockerCmdExec<InspectContainer
 		WebTarget webResource = getBaseResource().path("/containers/{id}/json").resolveTemplate("id", command.getContainerId());
 		
 		LOGGER.debug("GET: {}", webResource);
-		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).get(InspectContainerResponse.class);
+		return webResource.request().accept(MediaType.APPLICATION_JSON).get(InspectContainerResponse.class);
 	}
 
 }

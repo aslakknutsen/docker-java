@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.CreateImageCmd;
 import com.github.dockerjava.api.command.CreateImageResponse;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class CreateImageCmdExec extends AbstrDockerCmdExec<CreateImageCmd, CreateImageResponse> implements CreateImageCmd.Exec {
 	
@@ -24,7 +25,7 @@ public class CreateImageCmdExec extends AbstrDockerCmdExec<CreateImageCmd, Creat
                 .queryParam("fromSrc", "-");
 		
 		LOGGER.trace("POST: {}", webResource);
-		return webResource.request().accept(WebTarget.MediaType.APPLICATION_OCTET_STREAM)
+		return webResource.request().accept(MediaType.APPLICATION_OCTET_STREAM)
 				.post(command.getImageStream(), CreateImageResponse.class);
 	}
 }

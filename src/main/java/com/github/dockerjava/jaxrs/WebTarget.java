@@ -111,6 +111,7 @@ public class WebTarget {
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public <T> T get(Class<T> type) {
             RequestBuilder builder = setupBuilder(RequestBuilder.get());
             CloseableHttpResponse response = null;
@@ -181,6 +182,7 @@ public class WebTarget {
             return post(obj, mediaType.getType(), type);
         }
 
+        @SuppressWarnings("unchecked")
         public <T> T post(Object obj, String mediaType, Class<T> type) {
             ObjectMapper mapper = new ObjectMapper();
             RequestBuilder builder = setupBuilder(RequestBuilder.post());

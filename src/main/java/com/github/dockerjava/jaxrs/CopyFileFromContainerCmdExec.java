@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.CopyFileFromContainerCmd;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class CopyFileFromContainerCmdExec extends AbstrDockerCmdExec<CopyFileFromContainerCmd, InputStream> implements CopyFileFromContainerCmd.Exec {
 	
@@ -24,7 +25,7 @@ public class CopyFileFromContainerCmdExec extends AbstrDockerCmdExec<CopyFileFro
 
 		LOGGER.trace("POST: " + webResource.toString());
 		
-		return webResource.request().accept(WebTarget.MediaType.APPLICATION_OCTET_STREAM).post(command, InputStream.class);		
+		return webResource.request().accept(MediaType.APPLICATION_OCTET_STREAM).post(command, InputStream.class);
 	}
 
 }

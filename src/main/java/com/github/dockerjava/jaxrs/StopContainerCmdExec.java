@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.StopContainerCmd;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class StopContainerCmdExec extends AbstrDockerCmdExec<StopContainerCmd, Void> implements StopContainerCmd.Exec {
 
@@ -20,7 +21,7 @@ public class StopContainerCmdExec extends AbstrDockerCmdExec<StopContainerCmd, V
 				.queryParam("t", String.valueOf(command.getTimeout()));
 		
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post();
+		webResource.request().accept(MediaType.APPLICATION_JSON).post();
 
 		return null;
 	}

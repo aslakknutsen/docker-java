@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.RemoveContainerCmd;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class RemoveContainerCmdExec extends AbstrDockerCmdExec<RemoveContainerCmd, Void> implements RemoveContainerCmd.Exec {
 
@@ -21,7 +22,7 @@ public class RemoveContainerCmdExec extends AbstrDockerCmdExec<RemoveContainerCm
 		
 		LOGGER.trace("DELETE: {}", webResource);
 		/*String response = */
-		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).delete();
+		webResource.request().accept(MediaType.APPLICATION_JSON).delete();
 //		LOGGER.trace("Response: {}", response);
 
 		return null;

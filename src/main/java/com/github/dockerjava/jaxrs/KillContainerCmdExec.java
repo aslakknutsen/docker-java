@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.KillContainerCmd;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class KillContainerCmdExec extends AbstrDockerCmdExec<KillContainerCmd, Void> implements KillContainerCmd.Exec {
 	
@@ -23,7 +24,7 @@ public class KillContainerCmdExec extends AbstrDockerCmdExec<KillContainerCmd, V
 		}
 	
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post();
+		webResource.request().accept(MediaType.APPLICATION_JSON).post();
 
 		return null;
 	}

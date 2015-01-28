@@ -1,7 +1,5 @@
 package com.github.dockerjava.jaxrs;
 
-import javax.xml.ws.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +18,7 @@ public class PingCmdExec extends AbstrDockerCmdExec<PingCmd, Void> implements Pi
 		WebTarget webResource = getBaseResource().path("/_ping");
 	       
         LOGGER.trace("GET: {}", webResource);
-        webResource.request().get(Response.class);
+        webResource.request().get(Void.class);
         
         return null;
 	}

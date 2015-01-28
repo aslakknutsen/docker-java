@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class ListContainersCmdExec extends AbstrDockerCmdExec<ListContainersCmd, List<Container>> implements ListContainersCmd.Exec {
 	
@@ -30,7 +31,7 @@ public class ListContainersCmdExec extends AbstrDockerCmdExec<ListContainersCmd,
         }
 
 		LOGGER.trace("GET: {}", webResource);
-		List<Container> containers = webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
+		List<Container> containers = webResource.request().accept(MediaType.APPLICATION_JSON)
 		        .get(TypeFactory.defaultInstance().constructCollectionType(List.class, Container.class));
 		LOGGER.trace("Response: {}", containers);
 

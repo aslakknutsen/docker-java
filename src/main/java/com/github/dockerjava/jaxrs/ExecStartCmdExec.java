@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.ExecStartCmd;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class ExecStartCmdExec extends AbstrDockerCmdExec<ExecStartCmd, InputStream> implements ExecStartCmd.Exec {
 
@@ -22,7 +23,7 @@ public class ExecStartCmdExec extends AbstrDockerCmdExec<ExecStartCmd, InputStre
 
         LOGGER.trace("POST: {}", webResource);
 
-        return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
+        return webResource.request().accept(MediaType.APPLICATION_JSON)
                 .post(command, InputStream.class);
     }
 }

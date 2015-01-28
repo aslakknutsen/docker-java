@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.PullImageCmd;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class PullImageCmdExec extends AbstrDockerCmdExec<PullImageCmd, InputStream> implements PullImageCmd.Exec {
 	
@@ -23,7 +24,7 @@ public class PullImageCmdExec extends AbstrDockerCmdExec<PullImageCmd, InputStre
                 .queryParam("registry", command.getRegistry());
 
 		LOGGER.trace("POST: {}", webResource);
-		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
+		return webResource.request().accept(MediaType.APPLICATION_JSON)
 		        .post(command, InputStream.class);
 //        return resourceWithOptionalAuthConfig(command, webResource.request())
 //				.accept(MediaType.APPLICATION_OCTET_STREAM_TYPE)

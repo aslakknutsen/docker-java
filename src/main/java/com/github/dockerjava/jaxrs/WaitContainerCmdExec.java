@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dockerjava.api.command.WaitContainerCmd;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class WaitContainerCmdExec extends AbstrDockerCmdExec<WaitContainerCmd, Integer> implements WaitContainerCmd.Exec {
 
@@ -21,7 +22,7 @@ public class WaitContainerCmdExec extends AbstrDockerCmdExec<WaitContainerCmd, I
 				.resolveTemplate("id", command.getContainerId());
 
 		LOGGER.trace("POST: {}", webResource);
-		ObjectNode ObjectNode = webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
+		ObjectNode ObjectNode = webResource.request().accept(MediaType.APPLICATION_JSON)
 				.post(ObjectNode.class);
 		
         return ObjectNode.get("StatusCode").asInt();

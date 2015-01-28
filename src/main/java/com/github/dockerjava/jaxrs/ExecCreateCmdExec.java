@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.ExecCreateCmd;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class ExecCreateCmdExec extends AbstrDockerCmdExec<ExecCreateCmd, ExecCreateCmdResponse> implements ExecCreateCmd.Exec {
 
@@ -21,6 +22,6 @@ public class ExecCreateCmdExec extends AbstrDockerCmdExec<ExecCreateCmd, ExecCre
 
         LOGGER.trace("POST: {}", webResource);
 
-        return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post(command, ExecCreateCmdResponse.class);
+        return webResource.request().accept(MediaType.APPLICATION_JSON).post(command, ExecCreateCmdResponse.class);
     }
 }

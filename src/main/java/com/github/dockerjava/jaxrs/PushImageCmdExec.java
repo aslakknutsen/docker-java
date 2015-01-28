@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.PushImageCmd;
 import com.github.dockerjava.api.model.AuthConfig;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class PushImageCmdExec extends AbstrDockerCmdExec<PushImageCmd, InputStream> implements PushImageCmd.Exec {
 	
@@ -26,7 +27,7 @@ public class PushImageCmdExec extends AbstrDockerCmdExec<PushImageCmd, InputStre
 		return webResource
                 .request()
 				.header("X-Registry-Auth", registryAuth)
-				.accept(WebTarget.MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
 				.post(InputStream.class);
 	}
 	

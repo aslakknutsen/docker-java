@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.AuthCmd;
 import com.github.dockerjava.api.model.AuthResponse;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class AuthCmdExec extends AbstrDockerCmdExec<AuthCmd,AuthResponse> implements AuthCmd.Exec {
 	
@@ -20,7 +21,7 @@ public class AuthCmdExec extends AbstrDockerCmdExec<AuthCmd,AuthResponse> implem
 		WebTarget webResource = getBaseResource().path("/auth");
 		LOGGER.trace("POST: {}", webResource);
 		return webResource.request()
-                .accept(WebTarget.MediaType.APPLICATION_JSON).post(command.getAuthConfig(), AuthResponse.class);
+                .accept(MediaType.APPLICATION_JSON).post(command.getAuthConfig(), AuthResponse.class);
 	}
 
 }

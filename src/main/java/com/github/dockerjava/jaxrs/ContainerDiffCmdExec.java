@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.dockerjava.api.command.ContainerDiffCmd;
 import com.github.dockerjava.api.model.ChangeLog;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class ContainerDiffCmdExec extends AbstrDockerCmdExec<ContainerDiffCmd, List<ChangeLog>> implements ContainerDiffCmd.Exec {
 	
@@ -23,7 +24,7 @@ public class ContainerDiffCmdExec extends AbstrDockerCmdExec<ContainerDiffCmd, L
 		WebTarget webResource = getBaseResource().path("/containers/{id}/changes").resolveTemplate("id", command.getContainerId());
 		
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
+		return webResource.request().accept(MediaType.APPLICATION_JSON)
 				.get(TypeFactory.defaultInstance().constructCollectionType(List.class, ChangeLog.class));
 	}
 

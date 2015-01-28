@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.VersionCmd;
 import com.github.dockerjava.api.model.Version;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class VersionCmdExec extends AbstrDockerCmdExec<VersionCmd, Version> implements VersionCmd.Exec {
 
@@ -20,7 +21,7 @@ public class VersionCmdExec extends AbstrDockerCmdExec<VersionCmd, Version> impl
 		WebTarget webResource = getBaseResource().path("/version");
 
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
+		return webResource.request().accept(MediaType.APPLICATION_JSON)
 				.get(Version.class);
 	}
 

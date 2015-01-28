@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.BuildImageCmd;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class BuildImageCmdExec extends AbstrDockerCmdExec<BuildImageCmd, InputStream> implements BuildImageCmd.Exec {
 	
@@ -40,8 +41,8 @@ public class BuildImageCmdExec extends AbstrDockerCmdExec<BuildImageCmd, InputSt
 		LOGGER.debug("POST: {}", webResource);
 		return webResource
                 .request()
-				.accept(WebTarget.MediaType.TEXT_PLAIN)
-				.post(command.getTarInputStream(), WebTarget.MediaType.APPLICATION_TAR, InputStream.class);
+				.accept(MediaType.TEXT_PLAIN)
+				.post(command.getTarInputStream(), MediaType.APPLICATION_TAR, InputStream.class);
 		
 	}
 

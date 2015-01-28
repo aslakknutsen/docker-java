@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.api.model.Info;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class InfoCmdExec extends AbstrDockerCmdExec<InfoCmd, Info> implements InfoCmd.Exec {
 	
@@ -20,7 +21,7 @@ public class InfoCmdExec extends AbstrDockerCmdExec<InfoCmd, Info> implements In
 		WebTarget webResource = getBaseResource().path("/info");
 
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).get(Info.class);
+		return webResource.request().accept(MediaType.APPLICATION_JSON).get(Info.class);
 	}
 
 }

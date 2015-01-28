@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.RestartContainerCmd;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class RestartContainerCmdExec extends AbstrDockerCmdExec<RestartContainerCmd, Void> implements RestartContainerCmd.Exec {
 
@@ -20,7 +21,7 @@ public class RestartContainerCmdExec extends AbstrDockerCmdExec<RestartContainer
 				.queryParam("t", String.valueOf(command.getTimeout()));
 		
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post();
+		webResource.request().accept(MediaType.APPLICATION_JSON).post();
 
 		return null;
 	}

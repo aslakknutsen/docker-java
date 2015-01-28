@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.TopContainerCmd;
 import com.github.dockerjava.api.command.TopContainerResponse;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class TopContainerCmdExec extends AbstrDockerCmdExec<TopContainerCmd, TopContainerResponse> implements TopContainerCmd.Exec {
 
@@ -24,7 +25,7 @@ public class TopContainerCmdExec extends AbstrDockerCmdExec<TopContainerCmd, Top
 			webResource = webResource.queryParam("ps_args", command.getPsArgs());
 		
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).get(TopContainerResponse.class);
+		return webResource.request().accept(MediaType.APPLICATION_JSON).get(TopContainerResponse.class);
 	}
 
 }

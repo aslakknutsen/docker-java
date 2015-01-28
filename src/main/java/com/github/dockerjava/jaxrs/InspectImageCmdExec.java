@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.dockerjava.api.command.InspectImageCmd;
 import com.github.dockerjava.api.command.InspectImageResponse;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class InspectImageCmdExec extends AbstrDockerCmdExec<InspectImageCmd, InspectImageResponse> implements InspectImageCmd.Exec {
 	
@@ -20,7 +21,7 @@ public class InspectImageCmdExec extends AbstrDockerCmdExec<InspectImageCmd, Ins
 		WebTarget webResource = getBaseResource().path("/images/{id}/json").resolveTemplate("id", command.getImageId());
 
 		LOGGER.trace("GET: {}", webResource);
-		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).get(InspectImageResponse.class);
+		return webResource.request().accept(MediaType.APPLICATION_JSON).get(InspectImageResponse.class);
 	}
 
 }

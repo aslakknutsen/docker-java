@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.dockerjava.api.command.ListImagesCmd;
 import com.github.dockerjava.api.model.Image;
+import com.github.dockerjava.jaxrs.WebTarget.MediaType;
 
 public class ListImagesCmdExec extends
 		AbstrDockerCmdExec<ListImagesCmd, List<Image>> implements
@@ -34,7 +35,7 @@ public class ListImagesCmdExec extends
 		LOGGER.trace("GET: {}", webResource);
 
 		List<Image> images = webResource.request()
-				.accept(WebTarget.MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
 				.get(TypeFactory.defaultInstance().constructCollectionType(List.class, Image.class));
 		LOGGER.trace("Response: {}", images);
 
