@@ -1,10 +1,5 @@
 package com.github.dockerjava.jaxrs;
 
-import static javax.ws.rs.client.Entity.entity;
-
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +11,13 @@ public class CommitCmdExec extends AbstrDockerCmdExec<CommitCmd, String> impleme
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CommitCmdExec.class);
 	
-	public CommitCmdExec(WebTarget baseResource) {
+	public CommitCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected String execute(CommitCmd command) {
-		WebTarget webResource = getBaseResource().path("/commit")
+		Requester webResource = getBaseResource().path("/commit")
                 .queryParam("container", command.getContainerId())
                 .queryParam("repo", command.getRepository())
                 .queryParam("tag", command.getTag())
@@ -31,7 +26,7 @@ public class CommitCmdExec extends AbstrDockerCmdExec<CommitCmd, String> impleme
                 .queryParam("pause",  command.hasPauseEnabled() ? "1" : "0");
 		
 		LOGGER.trace("POST: {}", webResource);
-		ObjectNode objectNode = webResource.request().accept("application/vnd.docker.raw-stream").post(entity(command, MediaType.APPLICATION_JSON), ObjectNode.class);
+		ObjectNode objectNode = webResource.request().accept("application/vnd.docker.raw-stream").post(command, ObjectNode.class);
         return objectNode.get("Id").asText();
 	}
 

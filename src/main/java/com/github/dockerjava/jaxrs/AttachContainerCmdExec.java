@@ -1,12 +1,6 @@
 package com.github.dockerjava.jaxrs;
 
-import static javax.ws.rs.client.Entity.entity;
-
 import java.io.InputStream;
-
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +12,13 @@ public class AttachContainerCmdExec extends AbstrDockerCmdExec<AttachContainerCm
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AttachContainerCmdExec.class);
 	
-	public AttachContainerCmdExec(WebTarget baseResource) {
+	public AttachContainerCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InputStream execute(AttachContainerCmd command) {
-		WebTarget webResource = getBaseResource().path("/containers/{id}/attach")
+		Requester webResource = getBaseResource().path("/containers/{id}/attach")
                 .resolveTemplate("id", command.getContainerId())
                 .queryParam("logs", command.hasLogsEnabled() ? "1" : "0")
              // .queryParam("stdin", command.hasStdinEnabled() ? "1" : "0")
@@ -34,8 +28,8 @@ public class AttachContainerCmdExec extends AbstrDockerCmdExec<AttachContainerCm
 
 		LOGGER.trace("POST: {}", webResource);
 		
-		return webResource.request().accept(MediaType.APPLICATION_OCTET_STREAM_TYPE)
-				.post(entity(null, MediaType.APPLICATION_JSON), Response.class).readEntity(InputStream.class);
+		return webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+				.post(null, InputStream.class);
 	}
 
 }

@@ -7,9 +7,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +21,7 @@ import com.github.dockerjava.api.model.Event;
 public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService> implements EventsCmd.Exec {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventsCmdExec.class);
     
-    public EventsCmdExec(WebTarget baseResource) {
+    public EventsCmdExec(Requester baseResource) {
         super(baseResource);
     }
 
@@ -32,7 +29,7 @@ public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService
     protected ExecutorService execute(EventsCmd command) {
     	ExecutorService executorService = Executors.newSingleThreadExecutor();
     	
-        WebTarget webResource = getBaseResource().path("/events")
+        Requester webResource = getBaseResource().path("/events")
                 .queryParam("since", command.getSince())
                 .queryParam("until", command.getUntil());
 
@@ -47,14 +44,14 @@ public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService
         private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
         private final EventCallback eventCallback;
-        private final WebTarget webTarget;
+        private final Requester webTarget;
 
-        private EventNotifier(EventCallback eventCallback, WebTarget webTarget) {
+        private EventNotifier(EventCallback eventCallback, Requester webTarget) {
             this.eventCallback = eventCallback;
             this.webTarget = webTarget;
         }
 
-        public static EventNotifier create(EventCallback eventCallback, WebTarget webTarget) {
+        public static EventNotifier create(EventCallback eventCallback, Requester webTarget) {
             checkNotNull(eventCallback, "An EventCallback must be provided");
             checkNotNull(webTarget, "An WebTarget must be provided");
             return new EventNotifier(eventCallback, webTarget);
@@ -63,10 +60,9 @@ public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService
         @Override
         public Void call() throws Exception {
             int numEvents=0;
-            Response response = null;
+            InputStream inputStream = null;
             try {
-                response = webTarget.request().get(Response.class);
-                InputStream inputStream = response.readEntity(InputStream.class);
+                inputStream = webTarget.request().get(InputStream.class);
                 JsonParser jp = JSON_FACTORY.createParser(inputStream);
                 while (jp.nextToken() != JsonToken.END_OBJECT && !jp.isClosed() && eventCallback.isReceiving()) {
                     eventCallback.onEvent(OBJECT_MAPPER.readValue(jp, Event.class));
@@ -77,8 +73,8 @@ public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService
                 eventCallback.onException(e);
             }
             finally {
-                if (response != null) {
-                    response.close();
+                if (inputStream != null) {
+                    inputStream.close();
                 }
             }
             eventCallback.onCompletion(numEvents);

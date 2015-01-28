@@ -1,10 +1,5 @@
 package com.github.dockerjava.jaxrs;
 
-import static javax.ws.rs.client.Entity.entity;
-
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,18 +11,18 @@ public class WaitContainerCmdExec extends AbstrDockerCmdExec<WaitContainerCmd, I
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WaitContainerCmdExec.class);
 
-	public WaitContainerCmdExec(WebTarget baseResource) {
+	public WaitContainerCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Integer execute(WaitContainerCmd command) {
-		WebTarget webResource = getBaseResource().path("/containers/{id}/wait")
+		Requester webResource = getBaseResource().path("/containers/{id}/wait")
 				.resolveTemplate("id", command.getContainerId());
 
 		LOGGER.trace("POST: {}", webResource);
-		ObjectNode ObjectNode = webResource.request().accept(MediaType.APPLICATION_JSON)
-				.post(entity(null, MediaType.TEXT_PLAIN), ObjectNode.class);
+		ObjectNode ObjectNode = webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+				.post(null, ObjectNode.class);
 		
         return ObjectNode.get("StatusCode").asInt();
 	}

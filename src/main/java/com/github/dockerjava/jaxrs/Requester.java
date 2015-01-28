@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 public class Requester {
 
     public static final String MEDIA_TYPE_JSON = "application/json";
+    public static final String MEDIA_TYPE_OCTET_STREAM = "application/octet-stream";
     
     private URIBuilder root;
     private HttpClient client;
@@ -47,7 +48,7 @@ public class Requester {
     }
     
     public Requester resolveTemplate(String key, String value) {
-        HashMap<String, String> newSubstritution = (HashMap<String, String>)subsitution.clone();
+        HashMap<String, String> newSubstritution = new HashMap<String, String>(subsitution);
         newSubstritution.put(key, value);
         return new Requester(client, root, newSubstritution);
     }
@@ -61,19 +62,24 @@ public class Requester {
     }
     
     public class Request {
-        private String accept = null;
-        private String contentType = null;
+        private Map<String, String> headers;
 
         public Request() {
+            this.headers = new HashMap<String, String>();
         }
 
         public Request accept(String mediaType) {
-            this.accept = mediaType;
+            this.headers.put(HttpHeaders.ACCEPT, mediaType);
             return this;
         }
         
         public Request contentType(String mediaType) {
-            this.contentType = mediaType;
+            this.headers.put(HttpHeaders.CONTENT_TYPE, mediaType);
+            return this;
+        }
+
+        public Request header(String header, String value) {
+            this.headers.put(header, value);
             return this;
         }
 
@@ -82,6 +88,15 @@ public class Requester {
             try {
                 System.out.println("URI: " + builder.getUri());
                 HttpResponse response = client.execute(builder.build());
+
+                // hack
+                if(type == InputStream.class) {
+                    return (T)response.getEntity().getContent();
+                }
+                if(type == Void.class) {
+                    return (T) null;
+                }
+
                 ObjectMapper mapper = new ObjectMapper();
 
                 String responseEntity = IOUtils.toString(response.getEntity().getContent());
@@ -110,8 +125,8 @@ public class Requester {
         public <T> T post(Object obj, Class<T> type) {
             ObjectMapper mapper = new ObjectMapper();
             RequestBuilder builder = setupBuilder(RequestBuilder.post());
-            if(builder.getHeaders(HttpHeaders.CONTENT_TYPE).length == 0) {
-                builder.addHeader(HttpHeaders.CONTENT_TYPE, accept);
+            if(builder.getHeaders(HttpHeaders.CONTENT_TYPE) == null || builder.getHeaders(HttpHeaders.CONTENT_TYPE).length == 0) {
+                builder.addHeader(HttpHeaders.CONTENT_TYPE, MEDIA_TYPE_JSON);
             }
             try {
                 String requestEntity = mapper.writeValueAsString(obj);
@@ -137,9 +152,6 @@ public class Requester {
         
         public void delete() {
             RequestBuilder builder = setupBuilder(RequestBuilder.delete());
-            if(builder.getHeaders(HttpHeaders.CONTENT_TYPE).length == 0) {
-                builder.addHeader(HttpHeaders.CONTENT_TYPE, accept);
-            }
             try {
                 client.execute(builder.build());
             } catch (Exception e) {
@@ -149,11 +161,8 @@ public class Requester {
         
         private RequestBuilder setupBuilder(RequestBuilder builder) {
             builder.setUri(replace(root.toString(), subsitution));
-            if(accept != null) {
-                builder.addHeader(HttpHeaders.ACCEPT, accept);
-            }
-            if(contentType != null) {
-                builder.addHeader(HttpHeaders.CONTENT_TYPE, contentType);
+            for(Map.Entry<String, String> entry : this.headers.entrySet()) {
+                builder.addHeader(entry.getKey(), entry.getValue());
             }
             return builder;
         }

@@ -1,12 +1,6 @@
 package com.github.dockerjava.jaxrs;
 
-import static javax.ws.rs.client.Entity.entity;
-
 import java.io.InputStream;
-
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,19 +12,19 @@ public class CopyFileFromContainerCmdExec extends AbstrDockerCmdExec<CopyFileFro
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CopyFileFromContainerCmdExec.class);
 	
-	public CopyFileFromContainerCmdExec(WebTarget baseResource) {
+	public CopyFileFromContainerCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected InputStream execute(CopyFileFromContainerCmd command) {
-		WebTarget webResource = getBaseResource()
+		Requester webResource = getBaseResource()
 				.path("/containers/{id}/copy")
 				.resolveTemplate("id", command.getContainerId());
 
 		LOGGER.trace("POST: " + webResource.toString());
 		
-		return webResource.request().accept(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(entity(command, MediaType.APPLICATION_JSON), Response.class).readEntity(InputStream.class);		
+		return webResource.request().accept(Requester.MEDIA_TYPE_OCTET_STREAM).post(command, InputStream.class);		
 	}
 
 }

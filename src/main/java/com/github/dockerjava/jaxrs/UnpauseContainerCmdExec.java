@@ -1,10 +1,5 @@
 package com.github.dockerjava.jaxrs;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,18 +9,18 @@ public class UnpauseContainerCmdExec extends AbstrDockerCmdExec<UnpauseContainer
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnpauseContainerCmdExec.class);
 
-	public UnpauseContainerCmdExec(WebTarget baseResource) {
+	public UnpauseContainerCmdExec(Requester baseResource) {
 		super(baseResource);
 	}
 
 	@Override
 	protected Void execute(UnpauseContainerCmd command) {
-		WebTarget webResource = getBaseResource().path("/containers/{id}/unpause")
+		Requester webResource = getBaseResource().path("/containers/{id}/unpause")
 				.resolveTemplate("id", command.getContainerId());
 		
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(MediaType.APPLICATION_JSON)
-				.post(Entity.entity(Response.class, MediaType.APPLICATION_JSON));
+		webResource.request().accept(Requester.MEDIA_TYPE_JSON)
+				.post(null, Void.class);
 
 		return null;
 	}
