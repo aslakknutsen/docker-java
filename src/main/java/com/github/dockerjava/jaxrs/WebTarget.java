@@ -161,6 +161,14 @@ public class WebTarget {
             }
         }
 
+        public void post() {
+            post(null, Void.class);
+        }
+
+        public <T> T post(Class<T> type) {
+            return post(null, type);
+        }
+
         public <T> T post(Object obj, Class<T> type) {
             if(obj instanceof InputStream) {
                 return post(obj, MediaType.APPLICATION_OCTET_STREAM, type);

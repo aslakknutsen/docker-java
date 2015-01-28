@@ -20,7 +20,7 @@ public class StopContainerCmdExec extends AbstrDockerCmdExec<StopContainerCmd, V
 				.queryParam("t", String.valueOf(command.getTimeout()));
 		
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post(null, Void.class);
+		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post();
 
 		return null;
 	}

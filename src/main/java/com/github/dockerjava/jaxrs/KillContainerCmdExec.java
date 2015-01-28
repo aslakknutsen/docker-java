@@ -23,7 +23,7 @@ public class KillContainerCmdExec extends AbstrDockerCmdExec<KillContainerCmd, V
 		}
 	
 		LOGGER.trace("POST: {}", webResource);
-		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post(null, Void.class);	
+		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON).post();
 
 		return null;
 	}

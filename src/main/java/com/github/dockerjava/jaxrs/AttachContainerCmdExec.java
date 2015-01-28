@@ -29,7 +29,7 @@ public class AttachContainerCmdExec extends AbstrDockerCmdExec<AttachContainerCm
 		LOGGER.trace("POST: {}", webResource);
 		
 		return webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
-				.post(null, InputStream.class);
+				.post(InputStream.class);
 	}
 
 }

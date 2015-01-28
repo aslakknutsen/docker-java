@@ -27,7 +27,7 @@ public class PushImageCmdExec extends AbstrDockerCmdExec<PushImageCmd, InputStre
                 .request()
 				.header("X-Registry-Auth", registryAuth)
 				.accept(WebTarget.MediaType.APPLICATION_JSON)
-				.post(null, InputStream.class);
+				.post(InputStream.class);
 	}
 	
 	private String name(PushImageCmd command) {

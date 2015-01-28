@@ -22,7 +22,7 @@ public class WaitContainerCmdExec extends AbstrDockerCmdExec<WaitContainerCmd, I
 
 		LOGGER.trace("POST: {}", webResource);
 		ObjectNode ObjectNode = webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
-				.post(null, ObjectNode.class);
+				.post(ObjectNode.class);
 		
         return ObjectNode.get("StatusCode").asInt();
 	}

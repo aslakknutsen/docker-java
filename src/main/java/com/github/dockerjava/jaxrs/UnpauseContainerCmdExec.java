@@ -20,7 +20,7 @@ public class UnpauseContainerCmdExec extends AbstrDockerCmdExec<UnpauseContainer
 		
 		LOGGER.trace("POST: {}", webResource);
 		webResource.request().accept(WebTarget.MediaType.APPLICATION_JSON)
-				.post(null, Void.class);
+				.post();
 
 		return null;
 	}

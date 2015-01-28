@@ -21,7 +21,7 @@ public class PauseContainerCmdExec extends AbstrDockerCmdExec<PauseContainerCmd,
 		LOGGER.trace("POST: {}", webResource);
 		webResource.request()
 				.accept(WebTarget.MediaType.APPLICATION_JSON)
-				.post(null, Void.class);
+				.post();
 
 		return null;
 	}
