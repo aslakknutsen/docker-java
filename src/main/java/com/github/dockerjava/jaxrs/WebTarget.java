@@ -1,10 +1,8 @@
 package com.github.dockerjava.jaxrs;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +16,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.jaxrs.util.ResponseStatusExceptionFilter;
 
 public class WebTarget {
@@ -49,32 +45,34 @@ public class WebTarget {
             
     private URIBuilder root;
     private CloseableHttpClient client;
-    private HashMap<String, String> subsitution;
+    private Map<String, String> substituion;
+    private JsonSerializer mapper;
     
     public static WebTarget from(CloseableHttpClient client, URIBuilder root) {
         return new WebTarget(client, root, new HashMap<String, String>());
     }
     
-    private WebTarget(CloseableHttpClient client, URIBuilder root, HashMap<String, String> subsitution) {
+    private WebTarget(CloseableHttpClient client, URIBuilder root, Map<String, String> substituion) {
         this.client = client;
         this.root = root;
-        this.subsitution = subsitution;
+        this.substituion = substituion;
+        this.mapper = JsonSerializer.getInstance();
     }
     
     public WebTarget path(String path) {
         URIBuilder newRoot = cloneRoot();
         newRoot.setPath(newRoot.getPath() +  path);
-        return new WebTarget(client, newRoot, subsitution);
+        return new WebTarget(client, newRoot, substituion);
     }
     
     public WebTarget queryParam(String key, String value) {
         URIBuilder newRoot = cloneRoot();
         newRoot.addParameter(key, value);
-        return new WebTarget(client, newRoot, subsitution);
+        return new WebTarget(client, newRoot, substituion);
     }
     
     public WebTarget resolveTemplate(String key, String value) {
-        HashMap<String, String> newSubstritution = new HashMap<String, String>(subsitution);
+        HashMap<String, String> newSubstritution = new HashMap<>(substituion);
         newSubstritution.put(key, value);
         return new WebTarget(client, root, newSubstritution);
     }
@@ -91,7 +89,7 @@ public class WebTarget {
         private Map<String, String> headers;
 
         public Request() {
-            this.headers = new HashMap<String, String>();
+            this.headers = new HashMap<>();
         }
 
         public Request accept(MediaType mediaType) {
@@ -134,10 +132,9 @@ public class WebTarget {
                 }
                 if(type == Void.class) {
                     closeResponse(response);
-                    return (T) null;
+                    return null;
                 }
 
-                ObjectMapper mapper = new ObjectMapper(); 
                 String responseEntity = EntityUtils.toString(response.getEntity());
                 System.out.println("Response: " + responseEntity);
 
@@ -156,8 +153,6 @@ public class WebTarget {
                 System.out.println(builder.getMethod() + ": " + builder.getUri());
                 response = client.execute(builder.build());
                 checkResponse(response);
-
-                ObjectMapper mapper = new ObjectMapper();
                 
                 String responseEntity = EntityUtils.toString(response.getEntity());
                 System.out.println("Response: " + responseEntity);
@@ -192,7 +187,6 @@ public class WebTarget {
 
         @SuppressWarnings("unchecked")
         public <T> T post(Object obj, String mediaType, Class<T> type) {
-            ObjectMapper mapper = new ObjectMapper();
             RequestBuilder builder = setupBuilder(RequestBuilder.post());
             CloseableHttpResponse response = null;
             try {
@@ -249,7 +243,7 @@ public class WebTarget {
             }
             try {
                 System.out.println("Closing");
-                ((Closeable)response).close();
+                response.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -270,7 +264,7 @@ public class WebTarget {
         }
         
         private RequestBuilder setupBuilder(RequestBuilder builder) {
-            builder.setUri(replace(root.toString(), subsitution));
+            builder.setUri(replace(root.toString(), substituion));
             for(Map.Entry<String, String> entry : this.headers.entrySet()) {
                 builder.addHeader(entry.getKey(), entry.getValue());
             }
