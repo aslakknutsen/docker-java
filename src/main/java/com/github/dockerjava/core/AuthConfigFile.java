@@ -7,21 +7,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.dockerjava.jaxrs.JsonSerializer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dockerjava.api.model.AuthConfig;
 
 public class AuthConfigFile {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final JsonSerializer jsonSerializer = JsonSerializer.getInstance();
     private static final TypeReference<Map<String, AuthConfig>> CONFIG_MAP_TYPE = new TypeReference<Map<String, AuthConfig>>() {};
     private final Map<String, AuthConfig> authConfigMap;
 
     public AuthConfigFile() {
-        authConfigMap = new HashMap<String, AuthConfig>();
+        authConfigMap = new HashMap<>();
     }
 
     void addConfig(AuthConfig config) {
@@ -80,7 +80,6 @@ public class AuthConfigFile {
         return "AuthConfigFile [authConfigMap=" + authConfigMap + "]";
     }
 
-
     public static AuthConfigFile loadConfig(File confFile) throws IOException {
         AuthConfigFile configFile = new AuthConfigFile();
         if (!confFile.exists()) {
@@ -88,7 +87,7 @@ public class AuthConfigFile {
         }
         Map<String, AuthConfig> configMap = null;
         try {
-            configMap = MAPPER.readValue(confFile, CONFIG_MAP_TYPE);
+            configMap = jsonSerializer.readValue(confFile, CONFIG_MAP_TYPE);
         } catch (IOException e) {
             // pass
         }

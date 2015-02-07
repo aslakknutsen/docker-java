@@ -41,8 +41,7 @@ public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService
     
     private static class EventNotifier implements Callable<Void> {
         private static final JsonFactory JSON_FACTORY = new JsonFactory();
-        private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
+        private static final JsonSerializer jsonSerializer = JsonSerializer.getInstance();
         private final EventCallback eventCallback;
         private final WebTarget webTarget;
 
@@ -65,7 +64,7 @@ public class EventsCmdExec extends AbstrDockerCmdExec<EventsCmd, ExecutorService
                 inputStream = webTarget.request().get(InputStream.class);
                 JsonParser jp = JSON_FACTORY.createParser(inputStream);
                 while (jp.nextToken() != JsonToken.END_OBJECT && !jp.isClosed() && eventCallback.isReceiving()) {
-                    eventCallback.onEvent(OBJECT_MAPPER.readValue(jp, Event.class));
+                    eventCallback.onEvent(jsonSerializer.readValue(jp, Event.class));
                     numEvents++;
                 }
             }
